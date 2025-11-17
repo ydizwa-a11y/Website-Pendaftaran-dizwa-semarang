@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pondok Pesantren Darul 'Izzi Wadda'wah Semarang</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a5f23 0%, #2d8c3d 50%, #1a5f23 100%);
+            color: #333;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #ffeb3b, #ffc107);
+            color: #333;
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            border: 2px solid #ff9800;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .form-section h2 {
+            text-align: center;
+            margin-bottom: 35px;
+            color: #2d8c3d;
+            font-size: 2rem;
+            font-weight: 600;
+            border-bottom: 3px solid #2d8c3d;
+            padding-bottom: 15px;
+        }
+
+        .form-section-title {
+            font-size: 1.3rem;
+            color: #2d8c3d;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8f4ff;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2d8c3d;
+            box-shadow: 0 0 0 3px rgba(45, 140, 61, 0.1);
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #2d8c3d, #1a5f23);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+            min-width: 160px;
+            box-shadow: 0 4px 15px rgba(45, 140, 61, 0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #1a5f23, #2d8c3d);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(45, 140, 61, 0.4);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268, #6c757d);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-wa {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-wa:hover {
+            background: linear-gradient(135deg, #128C7E, #25D366);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #20c997, #28a745);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333, #dc3545);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #333;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #e0a800, #ffc107);
+            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4);
+        }
+
+        .message {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+            display: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, #e8f4ff, #d1ecf1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            border-left: 5px solid #2d8c3d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .user-info p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .syarat-box {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        .syarat-box h3 {
+            color: #856404;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .syarat-box ul {
+            padding-left: 25px;
+        }
+
+        .syarat-box li {
+            margin-bottom: 12px;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .file-upload-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px dashed #dee2e6;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .file-upload-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .file-upload-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+
+        .file-upload-group input[type="file"] {
+            padding: 12px;
+            background: white;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-group input[type="file"]:hover {
+            border-color: #2d8c3d;
+            background: #f8fff9;
+        }
+
+        .file-upload-group small {
+            color: #6c757d;
+            font-style: italic;
+            display: block;
+            margin-top: 8px;
+        }
+
+        .wa-instruction {
+            background: linear-gradient(135deg, #d4f8e8, #c8f7e1);
+            border: 3px solid #25D366;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.2);
+        }
+
+        .wa-instruction h3 {
+            color: #25D366;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .wa-number {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #25D366;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .admin-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box input {
+            min-width: 300px;
+            padding: 12px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .pendaftar-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+
+        .pendaftar-table th, .pendaftar-table td {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .pendaftar-table th {
+            background: linear-gradient(135deg, #2d8c3d, #1a5f23);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .pendaftar-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .pendaftar-table tr:hover {
+            background: #e8f4ff;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-confirmed {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .file-links {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .file-link {
+            color: #2d8c3d;
+            text-decoration: none;
+            font-size: 11px;
+            padding: 5px 8px;
+            background: #e8f4ff;
+            border-radius: 5px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #d1ecf1;
+        }
+
+        .file-link:hover {
+            background: #d1ecf1;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: white;
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        footer p {
+            margin: 8px 0;
+            opacity: 0.9;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: " ";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            
+            .admin-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                justify-content: center;
+            }
+            
+            .search-box input {
+                min-width: auto;
+                flex: 1;
+            }
+            
+            .pendaftar-table {
+                font-size: 12px;
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                min-width: 140px;
+                padding: 14px 25px;
+                margin: 5px;
+            }
+            
+            .file-upload-section {
+                padding: 20px;
+            }
+            
+            .wa-instruction {
+                padding: 20px;
+            }
+            
+            .wa-number {
+                font-size: 1.3rem;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-section h2 {
+                font-size: 1.5rem;
+            }
+            
+            .welcome-banner {
+                font-size: 1.1rem;
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pondok Pesantren Darul 'Izzi Wadda'wah Semarang</h1>
+            <p>Formulir Pendaftaran Santri Baru Tahun Ajaran 2024/2025</p>
+        </header>
+
+        <div class="welcome-banner">
+            🎓 Selamat Datang di Ponpes Darul 'Izzi Wadda'wah Semarang
+        </div>
+
+        <div class="card">
+            <div id="message" class="message"></div>
+
+            <!-- Login Section -->
+            <div id="loginSection" class="form-section active">
+                <h2>Masuk ke Sistem</h2>
+                
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Masukkan email anda">
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Masukkan password">
+                </div>
+                
+                <div class="button-group">
+                    <button onclick="login()">🔐 Login</button>
+                    <button onclick="showRegister()" class="btn-secondary">📝 Daftar Akun Baru</button>
+                </div>
+
+                <div class="syarat-box">
+                    <h3>📋 Persyaratan Pendaftaran</h3>
+                    <ul>
+                        <li><strong>Kartu Keluarga (KK)</strong> - File PDF/Image</li>
+                        <li><strong>KTP Orang Tua</strong> - File PDF/Image</li>
+                        <li><strong>Ijazah Terakhir</strong> - File PDF/Image</li>
+                        <li><strong>Akte Kelahiran Anak</strong> - File PDF/Image</li>
+                        <li><strong>Pas Foto 3x4</strong> - Background Merah</li>
+                        <li><strong>Nomor HP Bapak dan Ibu</strong></li>
+                        <li><strong>Nama Lengkap Bapak & Ibu</strong></li>
+                        <li><strong>Nama Lengkap Anak</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Register Section -->
+            <div id="registerSection" class="form-section">
+                <h2>Buat Akun Baru</h2>
+                
+                <div class="form-group">
+                    <label for="regNama">Nama Lengkap Orang Tua</label>
+                    <input type="text" id="regNama" placeholder="Nama lengkap ayah/ibu">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" placeholder="Email aktif orang tua">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" placeholder="Buat password minimal 6 karakter">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPassword">Konfirmasi Password</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Ulangi password">
+                </div>
+                
+                <div class="button-group">
+                    <button onclick="register()">📝 Daftar Sekarang</button>
+                    <button onclick="showLogin()" class="btn-secondary">⬅️ Kembali ke Login</button>
+                </div>
+            </div>
+
+            <!-- User Form Section -->
+            <div id="userFormSection" class="form-section">
+                <div class="user-info">
+                    <p>Halo, <strong id="userName"></strong>! 👋</p>
+                    <button onclick="logout()" class="btn-secondary">🚪 Logout</button>
+                </div>
+
+                <h2>Formulir Pendaftaran Santri</h2>
+                
+                <div class="form-section-title">👨‍👩‍👧 Data Keluarga</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="namaAyah">Nama Lengkap Ayah *</label>
+                        <input type="text" id="namaAyah" required placeholder="Nama lengkap ayah">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="namaIbu">Nama Lengkap Ibu *</label>
+                        <input type="text" id="namaIbu" required placeholder="Nama lengkap ibu">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="namaAnak">Nama Lengkap Anak *</label>
+                    <input type="text" id="namaAnak" required placeholder="Nama lengkap calon santri">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="emailOrtu">Email Orang Tua *</label>
+                        <input type="email" id="emailOrtu" required placeholder="email@contoh.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tanggalLahir">Tanggal Lahir Anak *</label>
+                        <input type="date" id="tanggalLahir" required>
+                    </div>
+                </div>
+
+                <div class="form-section-title">📞 Kontak & Alamat</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="teleponAyah">Nomor HP Ayah *</label>
+                        <input type="tel" id="teleponAyah" required placeholder="08xxxxxxxxxx">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="teleponIbu">Nomor HP Ibu *</label>
+                        <input type="tel" id="teleponIbu" required placeholder="08xxxxxxxxxx">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="alamat">Alamat Lengkap *</label>
+                    <textarea id="alamat" rows="3" required placeholder="Alamat lengkap tempat tinggal"></textarea>
+                </div>
+
+                <div class="form-section-title">📎 Upload Dokumen</div>
+
+                <div class="file-upload-section">
+                    <div class="file-upload-group">
+                        <label for="fileKK">Kartu Keluarga (KK) *</label>
+                        <input type="file" id="fileKK" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small>Format: PDF, JPG, PNG (Maks. 2MB)</small>
+                    </div>
+
+                    <div class="file-upload-group">
+                        <label for="fileKTPAyah">KTP Ayah *</label>
+                        <input type="file" id="fileKTPAyah" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small>Format: PDF, JPG, PNG (Maks. 2MB)</small>
+                    </div>
+
+                    <div class="file-upload-group">
+                        <label for="fileKTPIbu">KTP Ibu *</label>
+                        <input type="file" id="fileKTPIbu" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small>Format: PDF, JPG, PNG (Maks. 2MB)</small>
+                    </div>
+
+                    <div class="file-upload-group">
+                        <label for="fileIjazah">Ijazah Terakhir *</label>
+                        <input type="file" id="fileIjazah" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small>Format: PDF, JPG, PNG (Maks. 2MB)</small>
+                    </div>
+
+                    <div class="file-upload-group">
+                        <label for="fileAkte">Akte Kelahiran *</label>
+                        <input type="file" id="fileAkte" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <small>Format: PDF, JPG, PNG (Maks. 2MB)</small>
+                    </div>
+
+                    <div class="file-upload-group">
+                        <label for="fileFoto">Pas Foto 3x4 *</label>
+                        <input type="file" id="fileFoto" accept=".jpg,.jpeg,.png" required>
+                        <small>Format: JPG, PNG - Background Merah (Maks. 2MB)</small>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button onclick="submitPendaftaran()">📤 Kirim Pendaftaran</button>
+                </div>
+
+                <div id="waInstruction" class="wa-instruction" style="display: none;">
+                    <h3>✅ Pendaftaran Berhasil!</h3>
+                    <p>Data pendaftaran Anda telah kami terima. Tunggu konfirmasi dari admin melalui email.</p>
+                    <p>Setelah dikonfirmasi, silakan chat WhatsApp berikut untuk proses pembayaran:</p>
+                    <div class="wa-number">📞 0877 4567 2106</div>
+                    <p><strong>💡 Penting:</strong> Pembayaran hanya diproses setelah chat WhatsApp</p>
+                    <button onclick="openWhatsApp()" class="btn-wa">💬 Chat WhatsApp Sekarang</button>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" class="form-section">
+                <div class="user-info">
+                    <p>Halo, <strong id="adminName"></strong> 👨‍💼 (Administrator)</p>
+                    <button onclick="logout()" class="btn-secondary">🚪 Logout</button>
+                </div>
+
+                <h2>Panel Admin - Data Pendaftar</h2>
+                
+                <div class="admin-controls">
+                    <button onclick="loadAdminData()" class="btn-success">🔄 Refresh Data</button>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Cari nama anak atau orang tua...">
+                        <button onclick="searchData()">🔍 Cari</button>
+                    </div>
+                </div>
+                
+                <div id="adminData">
+                    <table class="pendaftar-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Anak</th>
+                                <th>Orang Tua</th>
+                                <th>Kontak</th>
+                                <th>Dokumen</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTableBody">
+                            <!-- Data akan diisi oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Pondok Pesantren Darul 'Izzi Wadda'wah Semarang. All rights reserved.</p>
+            <p>Jl. Pendidikan No. 123, Semarang - Telp: (024) 1234567</p>
+        </footer>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbtRL623y7qvFYBgiflQi8y9lyUERsRtY",
+            authDomain: "website-pondok-pesantren.firebaseapp.com",
+            projectId: "website-pondok-pesantren",
+            storageBucket: "website-pondok-pesantren.firebasestorage.app",
+            messagingSenderId: "78427033026",
+            appId: "1:78427033026:web:617601af5fb83647f2da5b"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // Global variables
+        let currentUser = null;
+        let isAdmin = false;
+
+        // Authentication state listener
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                console.log("User logged in:", user.email);
+                
+                // Check if user is admin
+                try {
+                    const adminDoc = await db.collection('admins').doc(user.uid).get();
+                    if (adminDoc.exists) {
+                        isAdmin = true;
+                        showAdminPanel();
+                        document.getElementById('adminName').textContent = adminDoc.data().nama || 'Admin';
+                        showMessage('Login admin berhasil!', 'success');
+                    } else {
+                        isAdmin = false;
+                        showUserForm();
+                        document.getElementById('userName').textContent = user.displayName || user.email;
+                        checkExistingRegistration(user.uid);
+                    }
+                } catch (error) {
+                    console.error("Error checking admin status:", error);
+                    isAdmin = false;
+                    showUserForm();
+                }
+            } else {
+                currentUser = null;
+                isAdmin = false;
+                showLogin();
+            }
+        });
+
+        // Show sections functions
+        function showLogin() {
+            hideAllSections();
+            document.getElementById('loginSection').classList.add('active');
+            document.getElementById('message').style.display = 'none';
+        }
+
+        function showRegister() {
+            hideAllSections();
+            document.getElementById('registerSection').classList.add('active');
+            document.getElementById('message').style.display = 'none';
+        }
+
+        function showUserForm() {
+            hideAllSections();
+            document.getElementById('userFormSection').classList.add('active');
+            document.getElementById('message').style.display = 'none';
+        }
+
+        function showAdminPanel() {
+            hideAllSections();
+            document.getElementById('adminPanel').classList.add('active');
+            document.getElementById('message').style.display = 'none';
+            loadAdminData();
+        }
+
+        function hideAllSections() {
+            const sections = ['loginSection', 'registerSection', 'userFormSection', 'adminPanel'];
+            sections.forEach(section => {
+                document.getElementById(section).classList.remove('active');
+            });
+        }
+
+        // Auth functions
+        async function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Email dan password harus diisi!', 'error');
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showMessage('Login berhasil!', 'success');
+            } catch (error) {
+                console.error("Login error:", error);
+                let message = 'Login gagal! ';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        message += 'Email tidak ditemukan.';
+                        break;
+                    case 'auth/wrong-password':
+                        message += 'Password salah.';
+                        break;
+                    case 'auth/invalid-email':
+                        message += 'Format email tidak valid.';
+                        break;
+                    default:
+                        message += error.message;
+                }
+                showMessage(message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function register() {
+            const nama = document.getElementById('regNama').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if (!nama || !email || !password || !confirmPassword) {
+                showMessage('Semua field harus diisi!', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('Password dan konfirmasi password tidak cocok!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password minimal 6 karakter!', 'error');
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({
+                    displayName: nama
+                });
+                
+                // Save additional user data to Firestore
+                await db.collection('users').doc(userCredential.user.uid).set({
+                    nama: nama,
+                    email: email,
+                    role: 'user',
+                    createdAt: new Date()
+                });
+                
+                showMessage('Pendaftaran akun berhasil! Silakan login.', 'success');
+                showLogin();
+            } catch (error) {
+                console.error("Registration error:", error);
+                let message = 'Pendaftaran gagal! ';
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        message += 'Email sudah digunakan.';
+                        break;
+                    case 'auth/invalid-email':
+                        message += 'Format email tidak valid.';
+                        break;
+                    case 'auth/weak-password':
+                        message += 'Password terlalu lemah.';
+                        break;
+                    default:
+                        message += error.message;
+                }
+                showMessage(message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function logout() {
+            auth.signOut()
+                .then(() => {
+                    showMessage('Logout berhasil!', 'success');
+                })
+                .catch((error) => {
+                    console.error("Logout error:", error);
+                    showMessage('Error saat logout', 'error');
+                });
+        }
+
+        // Check if user already registered
+        async function checkExistingRegistration(userId) {
+            try {
+                const snapshot = await db.collection('pendaftaran')
+                    .where('userId', '==', userId)
+                    .get();
+                    
+                if (!snapshot.empty) {
+                    showMessage('Anda sudah mengirim pendaftaran sebelumnya. Tunggu konfirmasi admin.', 'info');
+                    document.getElementById('waInstruction').style.display = 'block';
+                }
+            } catch (error) {
+                console.error("Error checking registration:", error);
+            }
+        }
+
+        // Upload file to Firebase Storage
+        async function uploadFile(file, fileName) {
+            try {
+                const storageRef = storage.ref();
+                const fileRef = storageRef.child(`documents/${currentUser.uid}/${fileName}`);
+                const snapshot = await fileRef.put(file);
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                return downloadURL;
+            } catch (error) {
+                console.error("Error uploading file:", error);
+                throw error;
+            }
+        }
+
+        // Submit registration form
+        async function submitPendaftaran() {
+            if (!currentUser) {
+                showMessage('Silakan login terlebih dahulu!', 'error');
+                return;
+            }
+
+            // Get form values
+            const namaAyah = document.getElementById('namaAyah').value.trim();
+            const namaIbu = document.getElementById('namaIbu').value.trim();
+            const namaAnak = document.getElementById('namaAnak').value.trim();
+            const emailOrtu = document.getElementById('emailOrtu').value.trim();
+            const teleponAyah = document.getElementById('teleponAyah').value.trim();
+            const teleponIbu = document.getElementById('teleponIbu').value.trim();
+            const tanggalLahir = document.getElementById('tanggalLahir').value;
+            const alamat = document.getElementById('alamat').value.trim();
+
+            // Get files
+            const fileKK = document.getElementById('fileKK').files[0];
+            const fileKTPAyah = document.getElementById('fileKTPAyah').files[0];
+            const fileKTPIbu = document.getElementById('fileKTPIbu').files[0];
+            const fileIjazah = document.getElementById('fileIjazah').files[0];
+            const fileAkte = document.getElementById('fileAkte').files[0];
+            const fileFoto = document.getElementById('fileFoto').files[0];
+
+            // Validation
+            if (!namaAyah || !namaIbu || !namaAnak || !emailOrtu || !teleponAyah || !teleponIbu || !tanggalLahir || !alamat) {
+                showMessage('Semua field harus diisi!', 'error');
+                return;
+            }
+
+            if (!fileKK || !fileKTPAyah || !fileKTPIbu || !fileIjazah || !fileAkte || !fileFoto) {
+                showMessage('Semua dokumen harus diupload!', 'error');
+                return;
+            }
+
+            // File size validation (2MB max)
+            const maxSize = 2 * 1024 * 1024;
+            const files = [fileKK, fileKTPAyah, fileKTPIbu, fileIjazah, fileAkte, fileFoto];
+            for (let file of files) {
+                if (file && file.size > maxSize) {
+                    showMessage('File terlalu besar! Maksimal 2MB.', 'error');
+                    return;
+                }
+            }
+
+            setLoading(true);
+
+            try {
+                // Upload files
+                const files = {
+                    kk: await uploadFile(fileKK, 'kk'),
+                    ktpAyah: await uploadFile(fileKTPAyah, 'ktp_ayah'),
+                    ktpIbu: await uploadFile(fileKTPIbu, 'ktp_ibu'),
+                    ijazah: await uploadFile(fileIjazah, 'ijazah'),
+                    akte: await uploadFile(fileAkte, 'akte'),
+                    foto: await uploadFile(fileFoto, 'foto')
+                };
+
+                // Save registration data
+                const pendaftaranData = {
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    userNama: currentUser.displayName,
+                    namaAyah: namaAyah,
+                    namaIbu: namaIbu,
+                    namaAnak: namaAnak,
+                    emailOrtu: emailOrtu,
+                    teleponAyah: teleponAyah,
+                    teleponIbu: teleponIbu,
+                    tanggalLahir: tanggalLahir,
+                    alamat: alamat,
+                    files: files,
+                    status: 'pending',
+                    tanggalDaftar: new Date(),
+                    createdAt: new Date()
+                };
+
+                await db.collection('pendaftaran').add(pendaftaranData);
+
+                showMessage('Pendaftaran berhasil dikirim! Tunggu konfirmasi admin.', 'success');
+                document.getElementById('waInstruction').style.display = 'block';
+                
+                // Clear form
+                document.getElementById('namaAyah').value = '';
+                document.getElementById('namaIbu').value = '';
+                document.getElementById('namaAnak').value = '';
+                document.getElementById('emailOrtu').value = '';
+                document.getElementById('teleponAyah').value = '';
+                document.getElementById('teleponIbu').value = '';
+                document.getElementById('tanggalLahir').value = '';
+                document.getElementById('alamat').value = '';
+                document.getElementById('fileKK').value = '';
+                document.getElementById('fileKTPAyah').value = '';
+                document.getElementById('fileKTPIbu').value = '';
+                document.getElementById('fileIjazah').value = '';
+                document.getElementById('fileAkte').value = '';
+                document.getElementById('fileFoto').value = '';
+
+            } catch (error) {
+                console.error("Error submitting registration:", error);
+                showMessage('Error mengirim pendaftaran: ' + error.message, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Load admin data
+        async function loadAdminData() {
+            try {
+                const snapshot = await db.collection('pendaftaran')
+                    .orderBy('tanggalDaftar', 'desc')
+                    .get();
+                    
+                displayAdminData(snapshot);
+            } catch (error) {
+                console.error("Error loading admin data:", error);
+                showMessage('Error memuat data: ' + error.message, 'error');
+            }
+        }
+
+        // Search data
+        async function searchData() {
+            const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            try {
+                let snapshot;
+                if (searchTerm) {
+                    // Search in multiple fields
+                    const query1 = db.collection('pendaftaran')
+                        .where('namaAnak', '>=', searchTerm)
+                        .where('namaAnak', '<=', searchTerm + '\uf8ff');
+                        
+                    const query2 = db.collection('pendaftaran')
+                        .where('namaAyah', '>=', searchTerm)
+                        .where('namaAyah', '<=', searchTerm + '\uf8ff');
+                        
+                    const [snap1, snap2] = await Promise.all([query1.get(), query2.get()]);
+                    
+                    const combinedDocs = new Map();
+                    snap1.docs.forEach(doc => combinedDocs.set(doc.id, doc));
+                    snap2.docs.forEach(doc => combinedDocs.set(doc.id, doc));
+                    
+                    snapshot = { docs: Array.from(combinedDocs.values()) };
+                } else {
+                    snapshot = await db.collection('pendaftaran')
+                        .orderBy('tanggalDaftar', 'desc')
+                        .get();
+                }
+                
+                displayAdminData(snapshot);
+            } catch (error) {
+                console.error("Error searching data:", error);
+                showMessage('Error mencari data: ' + error.message, 'error');
+            }
+        }
+
+        // Display admin data in table
+        function displayAdminData(snapshot) {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+            
+            if (snapshot.empty) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Belum ada data pendaftaran</td></tr>';
+                return;
+            }
+            
+            snapshot.forEach((doc, index) => {
+                const data = doc.data();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${data.namaAnak}</strong></td>
+                    <td>
+                        <small><strong>Ayah:</strong> ${data.namaAyah}</small><br>
+                        <small><strong>Ibu:</strong> ${data.namaIbu}</small>
+                    </td>
+                    <td>
+                        <small><strong>Email:</strong> ${data.emailOrtu}</small><br>
+                        <small><strong>Ayah:</strong> ${data.teleponAyah}</small><br>
+                        <small><strong>Ibu:</strong> ${data.teleponIbu}</small>
+                    </td>
+                    <td>
+                        <div class="file-links">
+                            <a href="${data.files?.kk}" target="_blank" class="file-link">KK</a>
+                            <a href="${data.files?.ktpAyah}" target="_blank" class="file-link">KTP Ayah</a>
+                            <a href="${data.files?.ktpIbu}" target="_blank" class="file-link">KTP Ibu</a>
+                            <a href="${data.files?.ijazah}" target="_blank" class="file-link">Ijazah</a>
+                            <a href="${data.files?.akte}" target="_blank" class="file-link">Akte</a>
+                            <a href="${data.files?.foto}" target="_blank" class="file-link">Foto</a>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-${data.status}">
+                            ${data.status === 'pending' ? 'MENUNGGU' : 'DIKONFIRMASI'}
+                        </span>
+                    </td>
+                    <td><small>${new Date(data.tanggalDaftar?.toDate()).toLocaleDateString('id-ID')}</small></td>
+                    <td>
+                        <div class="action-buttons">
+                            ${data.status === 'pending' ? 
+                                `<button onclick="confirmPendaftaran('${doc.id}')" class="btn-success">✓ Konfirmasi</button>` : 
+                                '<span style="color: green; font-weight: bold;">✓</span>'
+                            }
+                            <button onclick="viewDetails('${doc.id}')" class="btn-warning">👁️ Detail</button>
+                            <button onclick="deletePendaftaran('${doc.id}')" class="btn-danger">🗑️ Hapus</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Confirm registration
+        async function confirmPendaftaran(docId) {
+            try {
+                await db.collection('pendaftaran').doc(docId).update({
+                    status: 'confirmed',
+                    confirmedAt: new Date()
+                });
+                
+                showMessage('Pendaftaran berhasil dikonfirmasi!', 'success');
+                loadAdminData();
+            } catch (error) {
+                console.error("Error confirming registration:", error);
+                showMessage('Error mengkonfirmasi: ' + error.message, 'error');
+            }
+        }
+
+        // Delete registration
+        async function deletePendaftaran(docId) {
+            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                try {
+                    await db.collection('pendaftaran').doc(docId).delete();
+                    showMessage('Data berhasil dihapus!', 'success');
+                    loadAdminData();
+                } catch (error) {
+                    console.error("Error deleting registration:", error);
+                    showMessage('Error menghapus data: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // View details
+        async function viewDetails(docId) {
+            try {
+                const doc = await db.collection('pendaftaran').doc(docId).get();
+                const data = doc.data();
+                
+                const details = `
+Nama Anak: ${data.namaAnak}
+Nama Ayah: ${data.namaAyah}
+Nama Ibu: ${data.namaIbu}
+Email: ${data.emailOrtu}
+Telepon Ayah: ${data.teleponAyah}
+Telepon Ibu: ${data.teleponIbu}
+Tanggal Lahir: ${data.tanggalLahir}
+Alamat: ${data.alamat}
+Status: ${data.status}
+Tanggal Daftar: ${new Date(data.tanggalDaftar?.toDate()).toLocaleString('id-ID')}
+                `;
+                
+                alert('Detail Pendaftaran:\n\n' + details);
+            } catch (error) {
+                console.error("Error viewing details:", error);
+                showMessage('Error memuat detail: ' + error.message, 'error');
+            }
+        }
+
+        // WhatsApp function
+        function openWhatsApp() {
+            const phone = "087745672106";
+            let text = "Halo, saya sudah mengisi formulir pendaftaran pondok pesantren. ";
+            
+            if (currentUser) {
+                text += `Data saya: ${currentUser.displayName || currentUser.email}. `;
+            }
+            
+            text += "Bagaimana cara melanjutkan pembayaran?";
+            
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // Show message
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = message;
+            messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Set loading state
+        function setLoading(loading) {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.disabled = loading;
+            });
+            
+            if (loading) {
+                document.body.classList.add('loading');
+            } else {
+                document.body.classList.remove('loading');
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Website Pondok Pesantren initialized");
+            showLogin();
+        });
+
+        // Enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const activeSection = document.querySelector('.form-section.active');
+                if (activeSection.id === 'loginSection') {
+                    login();
+                } else if (activeSection.id === 'registerSection') {
+                    register();
+                }
+            }
+        });
+
+        // File input validation
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const maxSize = 2 * 1024 * 1024; // 2MB
+                    if (file.size > maxSize) {
+                        showMessage('File terlalu besar! Maksimal 2MB.', 'error');
+                        e.target.value = '';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
